@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Ledger (Beta)</title>
+<meta name="description" content="One list of bills, everything else follows." />
+
+<!-- PWA / installable app metadata -->
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#233b39" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Ledger Beta" />
+<link rel="apple-touch-icon" href="./icons/icon-192.png" />
+<link rel="icon" href="./icons/icon-192.png" />
+
+<!-- Tailwind's utility classes power all of the app's styling. The app
+     itself only ships its custom color/font overrides inline; the base
+     utility framework is loaded here, same as it is inside Claude's own
+     artifact environment. -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.383.0?external=react",
+    "recharts": "https://esm.sh/recharts@2.12.7?external=react,react-dom",
+    "papaparse": "https://esm.sh/papaparse@5.4.1"
+  }
+}
+</script>
+
+<style>
+  html, body { margin: 0; padding: 0; background: #f6f3ec; }
+  #root { min-height: 100vh; }
+  /* Simple loading state shown before React mounts */
+  #boot-loading {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #f6f3ec; font-family: -apple-system, sans-serif; color: #6b6459; font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div id="root"><div id="boot-loading">Loading The Ledger…</div></div>
+
+<script src="./storage-shim.js"></script>
+<script type="module" src="./main.js"></script>
+</body>
+</html>
