@@ -38,15 +38,52 @@
 <style>
   html, body { margin: 0; padding: 0; background: #f6f3ec; }
   #root { min-height: 100vh; }
-  /* Simple loading state shown before React mounts */
+  /* The app's ONE loading screen.
+     It deliberately lives OUTSIDE #root: React's createRoot() wipes #root's
+     children on mount, which used to destroy this and swap in a second, slightly
+     different loading message — that hand-off was the visible "flash".
+     Now this is the only loading state. It paints instantly from inline CSS with
+     no dependency on the Tailwind CDN or on any JS having loaded, and the app
+     removes it (adds .done, then removes the node) once data is actually ready.
+     See the useEffect in FamilyBudgetApp that dismisses it. */
   #boot-loading {
     position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
     background: #f6f3ec; font-family: -apple-system, sans-serif; color: #6b6459; font-size: 14px;
+    z-index: 9999; transition: opacity .18s ease-out; flex-direction: column; gap: 14px;
+    text-align: center; padding: 24px;
+  }
+  #boot-loading.done { opacity: 0; pointer-events: none; }
+  #boot-stuck { display: none; max-width: 320px; line-height: 1.5; }
+  #boot-loading.stuck #boot-stuck { display: block; }
+  #boot-stuck button {
+    margin-top: 12px; background: #2f6f6b; color: #f6f3ec; border: none; border-radius: 999px;
+    padding: 10px 22px; font-size: 14px; font-weight: 600;
   }
 </style>
 </head>
 <body>
-<div id="root"><div id="boot-loading">Loading The Ledger…</div></div>
+<!-- OUTSIDE #root on purpose — see the #boot-loading comment above. -->
+<div id="boot-loading">
+  <div>Loading The Ledger…</div>
+  <div id="boot-stuck">
+    This is taking longer than usual. You may be offline, or a required file
+    didn't load.
+    <br /><button onclick="location.reload()">Reload</button>
+  </div>
+</div>
+<div id="root"></div>
+
+<script>
+  // Watchdog: if the app never mounts at all — a failed CDN fetch, a bad import, an
+  // ESM error — then no app code ever runs, nothing removes this screen, and the
+  // user stares at "Loading The Ledger…" forever with no idea why. That's a worse
+  // failure than the flash this design was meant to fix, so the guard has to live
+  // HERE, in plain inline JS that depends on nothing.
+  setTimeout(function () {
+    var el = document.getElementById("boot-loading");
+    if (el && document.body.contains(el)) el.classList.add("stuck");
+  }, 8000);
+</script>
 
 <script src="./storage-shim.js"></script>
 <script type="module" src="./main.js"></script>
