@@ -1,10 +1,14 @@
-const CACHE_NAME = "the-ledger-v38";
+const CACHE_NAME = "the-ledger-v39";
 
 // Files we control directly — cached immediately on install.
 const APP_SHELL = [
   "./",
   "./index.html",
   "./app.js",
+  // Prebuilt stylesheet (replaced the Tailwind CDN as of build 39). MUST be
+  // cached: it's now the app's only source of styling, and unlike the CDN it's
+  // ours to cache — which is what finally makes the PWA genuinely offline.
+  "./styles.css",
   "./main.js",
   "./storage-shim.js",
   "./manifest.json",

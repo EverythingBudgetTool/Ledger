@@ -15,11 +15,24 @@
 <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 <link rel="icon" href="./icons/icon-192.png" />
 
-<!-- Tailwind's utility classes power all of the app's styling. The app
-     itself only ships its custom color/font overrides inline; the base
-     utility framework is loaded here, same as it is inside Claude's own
-     artifact environment. -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- ALL of the app's styling — Tailwind's utilities AND The Ledger's custom
+     classes — is prebuilt into styles.css by the Tailwind CLI at build time.
+
+     A <link> stylesheet BLOCKS rendering until it's ready, which is the point:
+     the old runtime CDN (commented below) compiled CSS in the browser on every
+     load, so React could paint the real dashboard before any styles existed —
+     that was the "flash of unstyled content" (real content, bare column, no
+     layout). A blocking stylesheet makes that impossible.
+     It's also service-worker cacheable, so the PWA is now genuinely offline —
+     the CDN never was.
+
+     REBUILD styles.css whenever the JSX uses a new Tailwind class, or that
+     element ships unstyled. See DEPLOY-README in the build zip.
+
+     TO REVERT to the old behavior: comment the <link>, uncomment the <script>,
+     and restore the inline <style> block in the app source. -->
+<link rel="stylesheet" href="./styles.css" />
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
 <script type="importmap">
 {
