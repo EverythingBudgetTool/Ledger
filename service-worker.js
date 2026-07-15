@@ -1,4 +1,4 @@
-const CACHE_NAME = "the-ledger-v41";
+const CACHE_NAME = "the-ledger-v42";
 
 // Files we control directly — cached immediately on install.
 const APP_SHELL = [
