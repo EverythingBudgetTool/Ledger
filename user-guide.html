@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Ledger — User Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #233b39;
+    --brand: #2f6f6b;
+    --cream: #f6f3ec;
+    --paper: #ffffff;
+    --rule: #e5dfd3;
+    --ink: #2a2a2a;
+    --ink-light: #6b6459;
+    --flag: #b5793a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+  .header {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 2.5rem 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 28px;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 6px, rgba(246,243,236,0.06) 6px, rgba(246,243,236,0.06) 7px);
+  }
+  .header-inner { max-width: 760px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #9fb8b4; margin: 0 0 0.5rem; font-weight: 600;
+  }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 2.1rem;
+    margin: 0 0 0.5rem; letter-spacing: -0.01em;
+  }
+  .header p.sub { margin: 0; color: #c9d6d3; font-size: 0.95rem; max-width: 52ch; }
+  .header .ver { margin: 0.9rem 0 0; color: #7e9b97; font-size: 0.8rem; }
+
+  main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; }
+
+  .thesis {
+    background: var(--dark); color: var(--cream);
+    border-radius: 14px; padding: 1.4rem 1.5rem; margin: 0 0 1.5rem;
+  }
+  .thesis b { color: #fff; }
+  .thesis p { margin: 0; font-size: 0.95rem; color: #d7e2e0; }
+  .thesis p + p { margin-top: 0.7rem; }
+
+  .toc {
+    background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 14px; padding: 1.2rem 1.4rem; margin: 0 0 2rem;
+  }
+  .toc h2 {
+    font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600;
+    margin: 0 0 0.8rem; color: var(--dark);
+  }
+  .toc ol { margin: 0; padding-left: 1.3rem; }
+  .toc li { margin: 0.45rem 0; font-size: 0.92rem; }
+  .toc a { color: var(--brand); text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .what { color: var(--ink-light); font-weight: 400; }
+
+  section.sec { margin: 0 0 2.2rem; scroll-margin-top: 1rem; }
+  .sec-num {
+    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brand); font-weight: 700; margin: 0 0 0.25rem;
+  }
+  h2.sec-title {
+    font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600;
+    margin: 0 0 0.9rem; color: var(--dark); letter-spacing: -0.01em;
+  }
+  .card {
+    background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 14px; padding: 1.3rem 1.4rem;
+  }
+  .card p { margin: 0 0 0.85rem; font-size: 0.93rem; }
+  .card p:last-child { margin-bottom: 0; }
+  h3 {
+    font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600;
+    margin: 1.4rem 0 0.5rem; color: var(--dark);
+  }
+  .card > h3:first-child { margin-top: 0; }
+  ul.list { margin: 0 0 0.9rem; padding-left: 1.15rem; }
+  ul.list li { margin: 0.35rem 0; font-size: 0.93rem; }
+  .note {
+    background: var(--cream); border-left: 3px solid var(--brand);
+    padding: 0.7rem 0.9rem; border-radius: 0 8px 8px 0;
+    font-size: 0.87rem; color: var(--ink-light); margin: 0.9rem 0;
+  }
+  .note b { color: var(--ink); }
+  .newflag {
+    display: inline-block; font-size: 0.62rem; letter-spacing: 0.08em;
+    text-transform: uppercase; font-weight: 700; color: var(--flag);
+    border: 1px solid var(--flag); border-radius: 999px;
+    padding: 0.05rem 0.4rem; margin-left: 0.45rem; vertical-align: 0.1em;
+  }
+  code {
+    background: var(--cream); border: 1px solid var(--rule);
+    border-radius: 4px; padding: 0.05rem 0.3rem; font-size: 0.85em;
+  }
+  .foot {
+    text-align: center; color: var(--ink-light); font-size: 0.8rem;
+    margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 1.7rem; }
+    h2.sec-title { font-size: 1.25rem; }
+    main { padding: 1.2rem 1rem 3rem; }
+    .card { padding: 1.1rem 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">The Ledger — Proof of Solvency</p>
+    <h1>User Guide</h1>
+    <p class="sub">One list of bills — everything else follows. What each screen does, and why it works the way it does.</p>
+    <p class="ver">v1.0-beta · Updated July 2026</p>
+  </div>
+</div>
+
+<main>
+
+  <div class="thesis">
+    <p><b>The one idea worth knowing.</b> Almost everything in The Ledger is generated from a single thing: your list of bills. Add a bill once — who it's paid to, which account, how much, how often — and the app builds your Upcoming list, your Savings Plan, your Budget, your Dashboard projections, and your account statements from that one source.</p>
+    <p>There is no second place to enter the same information. <b>If a number looks wrong anywhere, the fix almost always lives in the bill itself.</b></p>
+  </div>
+
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#install">Installing it</a> <span class="what">— putting it on your phone or computer</span></li>
+      <li><a href="#around">Getting around</a> <span class="what">— the six things in the tab bar</span></li>
+      <li><a href="#dashboard">Dashboard</a> <span class="what">— home base, and the cards that only appear when they matter</span></li>
+      <li><a href="#register">Register, All Transactions &amp; Scheduled</a> <span class="what">— what's actually happening</span></li>
+      <li><a href="#bulk">Fixing a lot of rows at once</a> <span class="what">— the No payee filter and bulk edit</span></li>
+      <li><a href="#reports">Reports</a> <span class="what">— historical totals and forward projections</span></li>
+      <li><a href="#income">Income &amp; Savings Plan</a> <span class="what">— the number this app exists to give you</span></li>
+      <li><a href="#budget">Budget</a> <span class="what">— envelopes, smoothed averages, the emergency fund</span></li>
+      <li><a href="#goals">Debt Payoff &amp; Wishlist</a> <span class="what">— things you're working toward</span></li>
+      <li><a href="#setup">Setup</a> <span class="what">— accounts, bills, payees, categories, transfers, gifts</span></li>
+      <li><a href="#backup">Backup &amp; your data</a> <span class="what">— where it lives and how to keep it</span></li>
+    </ol>
+  </div>
+
+  <section class="sec" id="install">
+    <p class="sec-num">Section 1</p>
+    <h2 class="sec-title">Installing it</h2>
+    <div class="card">
+      <p>The Ledger installs like a normal app on any device — its own icon, full screen, and it works with no connection once you've opened it once.</p>
+      <h3>iPhone &amp; iPad — Safari</h3>
+      <ul class="list">
+        <li>Open the link in <b>Safari</b> (not Chrome — on iOS only Safari can install apps).</li>
+        <li>Tap the <b>Share</b> button — the square with an up-arrow.</li>
+        <li>Scroll down, tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+      </ul>
+      <h3>Android — Chrome</h3>
+      <ul class="list">
+        <li>Open the link in Chrome.</li>
+        <li>Tap the <b>⋮</b> menu, then <b>Install app</b> or <b>Add to Home screen</b>.</li>
+      </ul>
+      <h3>Desktop</h3>
+      <p>Chrome and Edge show an install icon in the address bar. Or just use it in a browser tab — nothing is lost either way.</p>
+      <div class="note">
+        <b>Your data never leaves your device.</b> There is no cloud, no account, and nothing to sign up for. That's the deal: complete privacy, and the responsibility that comes with it. <b>Your backup file is your only copy</b> — see <a href="#backup">Backup</a>.
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="around">
+    <p class="sec-num">Section 2</p>
+    <h2 class="sec-title">Getting around</h2>
+    <div class="card">
+      <p>The tab bar has six things. <b>Dashboard</b> sits at the far left and <b>Help</b> at the far right — both always one tap away. Between them are four groups, each opening a short menu.</p>
+      <ul class="list">
+        <li><b>Track</b> — Register, All Transactions, Scheduled, Reports. <i>What's actually happening.</i></li>
+        <li><b>Plan</b> — Income, Savings Plan, Budget. <i>Where money comes from and where it's meant to go.</i></li>
+        <li><b>Goals</b> — Debt Payoff, Wishlist. <i>Things you're working toward.</i></li>
+        <li><b>Setup</b> — Accounts, Bills, Payees, Categories, Transfers, Gifts, Backup. <i>The configuration everything else is built from.</i></li>
+      </ul>
+      <p>On a narrow screen, Dashboard and Help shrink to just their icons. Tapping <b>?</b> opens a menu with the quick start, both guides, and the feedback form.<span class="newflag">new</span></p>
+    </div>
+  </section>
+
+  <section class="sec" id="dashboard">
+    <p class="sec-num">Section 3</p>
+    <h2 class="sec-title">Dashboard</h2>
+    <div class="card">
+      <p>Home base. A 12-month net worth projection, and a tappable year heatmap — tap any month and the whole dashboard jumps to it. A <b>Today</b> link appears whenever you've wandered off the current month.</p>
+      <h3>Cards that only appear when they're relevant</h3>
+      <ul class="list">
+        <li><b>Balance alerts</b> — when an account is heading somewhere you won't like.</li>
+        <li><b>Budget Health</b> — spent vs. budgeted this month, and which categories are running over.</li>
+        <li><b>Emergency Fund</b> — progress toward covering your essential bills.</li>
+        <li><b>Gifts coming up</b> — anything in the next year.</li>
+        <li><b>Awaiting reimbursement</b> — business expenses you've flagged and not yet been paid back for.</li>
+      </ul>
+      <div class="note">If a card isn't there, it's because there's nothing to say. That's deliberate — an empty card is noise.</div>
+    </div>
+  </section>
+
+  <section class="sec" id="register">
+    <p class="sec-num">Section 4</p>
+    <h2 class="sec-title">Register, All Transactions &amp; Scheduled</h2>
+    <div class="card">
+      <h3>Register — one account at a time</h3>
+      <p>An account's full history: real transactions blended with what's scheduled to happen. For a credit card, history is grouped by <b>statement period</b>; for everything else, by month — which is the same idea, since a month is just a statement that closes at month end.</p>
+      <p>Tap any row for actions: mark paid, skip an occurrence, edit just this one or all future ones, assign a charge to a budget envelope, or flag it as a reimbursable business expense.</p>
+
+      <h3>All Transactions — everything at once</h3>
+      <p>The same transactions, flat, across every account, newest first. Search covers payee, description, category, account, notes, and amount. This is where to go when you don't know which account something landed in.</p>
+
+      <h3>Scheduled — a calendar of what's coming</h3>
+      <p>Every account's upcoming occurrences on a real calendar. The Register, zoomed out.</p>
+
+      <h3>Notes<span class="newflag">new</span></h3>
+      <p>Every transaction can carry a note — free text, separate from the description. <b>The description is what the bank said; the note is what you know.</b> A transfer that covers three bills can say so.</p>
+      <ul class="list">
+        <li>A small speech-bubble icon marks rows that have one. The text isn't shown on the row — it would crowd out everything else — so tap through to read it.</li>
+        <li><b>Notes are searchable</b>, which is the point. Note a transfer "covers Alaska Visa + Disney + AAA" and searching <i>disney</i> finds it.</li>
+        <li>A transfer carries its note on <b>both legs</b> — a note describes the movement, not one side of it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="bulk">
+    <p class="sec-num">Section 5</p>
+    <h2 class="sec-title">Fixing a lot of rows at once<span class="newflag">new</span></h2>
+    <div class="card">
+      <p>Bank imports arrive messy. A description like <code>Debit PIN Purchase SAVE MART#654KI KINGSBURG CAUS05154</code> is the bank's record, not a merchant name — and plenty of rows arrive with no payee at all.</p>
+
+      <h3>Finding the rows</h3>
+      <p>On <b>All Transactions</b>, tick <b>No payee</b>. That's the whole trick: search finds text that's <i>there</i>, and until now nothing could ask for text that's <i>missing</i>. Transfers are excluded — a transfer between your own accounts has no merchant.</p>
+      <p>It stacks with the search box, and that combination is the real tool. Search <code>654</code> with <b>No payee</b> ticked and you get exactly the Save Mart rows that still need a name.</p>
+
+      <h3>Fixing them</h3>
+      <ul class="list">
+        <li>Tap <b>Select</b> → checkboxes appear.</li>
+        <li>Tick rows, or use <b>Select all</b>. On the Register each statement period gets its own Select all, and the selection <b>accumulates</b> — do one statement, then another, and edit both together.</li>
+        <li>Tap <b>Edit</b> → choose one field: <b>Payee</b>, <b>Description</b>, or <b>Category</b>.</li>
+        <li>Type the value. You'll see exactly what's about to happen, and a warning if any of those rows already have a value there.</li>
+      </ul>
+
+      <div class="note">
+        <b>Why only those three fields?</b> They're <i>labels</i> — descriptive text about a transaction. Amount, date, account and type are <i>facts</i> about what happened, and there's no case where twenty rows should share a new amount. Keeping facts out is also what keeps this safely away from the Savings Plan.
+      </div>
+      <div class="note">
+        <b>Descriptions are replaced, not filled.</b> Bank text sometimes carries the only record of what happened — a cash-back split like <code>$16.53PUR/$50.00CA</code>, or a reference number. Bulk-editing a description destroys that. The app warns you; it can't undo it.
+      </div>
+      <div class="note">
+        <b>The app never guesses a payee.</b> It finds the rows and applies your decision. It won't cluster, suggest, or auto-fill — because it can't know that <code>STORE</code> means McDonald's on one card and the Disney Store on another. You know that. It doesn't.
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="reports">
+    <p class="sec-num">Section 6</p>
+    <h2 class="sec-title">Reports</h2>
+    <div class="card">
+      <p>Pick any combination of accounts, save that selection with a name, then choose <b>Historical</b> or <b>Projected</b>.</p>
+      <ul class="list">
+        <li><b>Historical</b> — real monthly totals grouped by Account, Category, or Payee, with a Total row. Click any month to see the actual transactions behind the number.</li>
+        <li><b>Projected</b> — a combined forward-looking balance chart across everything you picked.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="income">
+    <p class="sec-num">Section 7</p>
+    <h2 class="sec-title">Income &amp; Savings Plan</h2>
+    <div class="card">
+      <h3>Income</h3>
+      <p>Sources can be salary or hourly. Hourly sources can carry overtime, with a multiplier and a take-home percentage. Two tools live here:</p>
+      <ul class="list">
+        <li><b>Overtime calculator</b> — "I need to cover $X. How many hours?"</li>
+        <li><b>Paycheck estimator</b> — "I worked these hours. What's the check?" Its result can be applied straight to your next real paycheck with one tap.</li>
+      </ul>
+
+      <h3>Savings Plan</h3>
+      <p>This is the number the app exists to produce: <b>how much to move to savings each pay period so nothing catches you off guard.</b> It looks ahead at everything on your bill list — including the annual and every-few-years ones that are easy to forget — and works out what this paycheck owes the future.</p>
+      <div class="note">Expand <b>Show the math</b> for the full breakdown. It isn't a black box, and it shouldn't be trusted like one.</div>
+    </div>
+  </section>
+
+  <section class="sec" id="budget">
+    <p class="sec-num">Section 8</p>
+    <h2 class="sec-title">Budget</h2>
+    <div class="card">
+      <p>Every bill, grouped by category, shown as its true amount alongside a <b>smoothed monthly average</b> — so a $600 annual insurance bill reads as $50/month for planning, while still landing as $600 on its real due date.</p>
+      <h3>Essentials and the emergency fund</h3>
+      <p>Mark a bill <b>essential</b> and it counts toward your Emergency Fund target. The target isn't a round number someone invented — it's your own essential bills, added up.</p>
+      <h3>Envelopes</h3>
+      <p>Mark a bill as a <b>budget line</b> and it becomes an envelope: a placeholder that starts each cycle at its full amount and spends down as you assign real transactions to it from the Register.</p>
+      <p>An envelope can also be set to <b>automatically count every charge on its account</b> — useful for a shared card you don't fully control.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="goals">
+    <p class="sec-num">Section 9</p>
+    <h2 class="sec-title">Debt Payoff &amp; Wishlist</h2>
+    <div class="card">
+      <h3>Debt Payoff</h3>
+      <p>Compare <b>snowball</b>, <b>avalanche</b>, your own <b>custom order</b>, and <b>minimums only</b> — side by side, with real dates.</p>
+      <p>The <b>Balance transfer comparison</b> shows exactly when a specific debt gets paid off under either scenario, fee included. Not "you'd save roughly this much" — the actual month it disappears.</p>
+      <h3>Wishlist</h3>
+      <p>Things you want but haven't committed to. Each carries a priority order and a funding source, kept separate from your regular bills so they never quietly become obligations.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="setup">
+    <p class="sec-num">Section 10</p>
+    <h2 class="sec-title">Setup</h2>
+    <div class="card">
+      <h3>Accounts</h3>
+      <p>Checking, savings, credit cards, loans — anything money moves through. Give each its real current balance; everything else is measured from there. Credit cards can carry a statement closing day, which is what groups the Register into statement periods.</p>
+
+      <h3>Bills</h3>
+      <p>The heart of it. Who it's paid to, which account, how much, how often.</p>
+      <p>Seven frequencies, worded the way you'd actually say them:</p>
+      <ul class="list">
+        <li>Every month</li>
+        <li>Every 2 weeks</li>
+        <li>Quarterly (every 3 months, same day)</li>
+        <li>A few times a year (custom dates)</li>
+        <li>Once a year</li>
+        <li>One time only</li>
+        <li><b>Every few years</b> — e.g. a 2-year membership</li>
+      </ul>
+      <p>That last one is the fiddly case done properly: it puts the real charge only on its true due year, while still contributing an honest smoothed average to your Budget every month in between.</p>
+
+      <h3>Payees &amp; Categories<span class="newflag">new</span></h3>
+      <p>Your vocabulary, in one place. Every payee and category you've used, with counts, so you can see what's actually in your data.</p>
+      <p>Rename a payee here and it updates across transactions, bills, and income together — a payee is shared vocabulary, not a per-row label. Merge two that should be one.</p>
+      <div class="note"><b>Nothing is ever suggested.</b> These screens show you the list; every merge is your call. Names that look like duplicates usually aren't — "DMV Mustang" and "DMV Old Van" are two vehicles, and only you know that.</div>
+
+      <h3>Transfers</h3>
+      <p>Money moving between your own accounts. Both legs are created together and stay paired, so deleting one can't quietly orphan the other.</p>
+
+      <h3>Gifts</h3>
+      <p>Birthdays and holidays, by occasion and recipient, with priorities — so December stops being a surprise every year.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="backup">
+    <p class="sec-num">Section 11</p>
+    <h2 class="sec-title">Backup &amp; your data</h2>
+    <div class="card">
+      <p>Everything lives on your device. No cloud, no account, no server. Nobody else has a copy — including whoever wrote this.</p>
+      <p>That's the whole privacy promise, and it has one consequence worth taking seriously: <b>your backup file is your only copy.</b></p>
+      <ul class="list">
+        <li><b>Export</b> writes your entire dataset to a file. Do it regularly. It's also how you move to a new phone.</li>
+        <li><b>Import</b> reads one back.</li>
+        <li><b>Auto-backup</b> turns on a periodic reminder to export. It reminds — it can't save the file for you, because it has nowhere to put it.</li>
+      </ul>
+      <div class="note"><b>Treat the file like any financial document.</b> It's your real numbers in plain text.</div>
+    </div>
+  </section>
+
+  <div class="foot">
+    The Ledger · One list of bills, everything else follows.<br>
+    Found something confusing or broken? <b>Help → Send feedback</b> in the app.
+  </div>
+
+</main>
+</body>
+</html>

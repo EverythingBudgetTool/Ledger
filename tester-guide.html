@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Ledger — Tester Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #233b39;
+    --brand: #2f6f6b;
+    --cream: #f6f3ec;
+    --paper: #ffffff;
+    --rule: #e5dfd3;
+    --ink: #2a2a2a;
+    --ink-light: #6b6459;
+    --flag: #b5793a;
+    --danger: #a34d4d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+  .header {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 2.5rem 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 28px;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 6px, rgba(246,243,236,0.06) 6px, rgba(246,243,236,0.06) 7px);
+  }
+  .header-inner { max-width: 720px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9fb8b4;
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2.1rem;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .header p.sub {
+    margin: 0;
+    color: #c9d6d3;
+    font-size: 0.95rem;
+    max-width: 46ch;
+  }
+
+  .tally-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.85rem 1.5rem;
+  }
+  .tally-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .tally-count {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--dark);
+    white-space: nowrap;
+  }
+  .tally-track {
+    flex: 1;
+    height: 6px;
+    background: var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .tally-fill {
+    height: 100%;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .reset-link {
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  main { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .intro {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 16px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 2rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+  }
+  .intro b { color: var(--dark); }
+
+  section.group { margin-bottom: 2.75rem; }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--dark);
+  }
+  .group-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.35rem;
+    color: var(--dark);
+    margin: 0;
+  }
+  .group-head span.count {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    font-weight: 500;
+  }
+
+  .item {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 0.95rem 1.1rem;
+    margin-bottom: 0.6rem;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .item.checked {
+    background: #fbfaf6;
+    border-color: var(--rule);
+  }
+  .item.checked .item-title { color: var(--ink-light); text-decoration: line-through; text-decoration-color: var(--rule); }
+
+  .checkbox {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--brand);
+    border-radius: 6px;
+    margin-top: 0.1rem;
+    cursor: pointer;
+    position: relative;
+    background: var(--paper);
+  }
+  .checkbox svg {
+    position: absolute; inset: 0; margin: auto;
+    width: 14px; height: 14px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .item.checked .checkbox { background: var(--brand); }
+  .item.checked .checkbox svg { opacity: 1; transform: scale(1); }
+
+  .item-body { flex: 1; }
+  .item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--dark);
+    margin: 0 0 0.3rem;
+    cursor: pointer;
+  }
+  .item-desc {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    margin: 0;
+  }
+  .item-flag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .item-flag.watch { background: #f3e6d3; color: var(--flag); }
+  .item-flag.new { background: #dbe9e7; color: var(--brand); }
+
+  .notes-field {
+    margin-top: 0.6rem;
+  }
+  .notes-field textarea {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 2.2rem;
+    background: var(--cream);
+  }
+  .notes-field textarea::placeholder { color: #b3ab9c; }
+
+  footer {
+    text-align: center;
+    padding: 2rem 1.5rem 3rem;
+    color: var(--ink-light);
+    font-size: 0.82rem;
+  }
+  footer a { color: var(--brand); }
+
+  .send-section {
+    background: var(--dark);
+    border-radius: 16px;
+    padding: 1.6rem 1.5rem;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .send-section h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 1.3rem;
+    margin: 0 0 0.4rem;
+  }
+  .send-section p {
+    color: #c9d6d3;
+    font-size: 0.85rem;
+    margin: 0 0 1.1rem;
+    max-width: 42ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .send-btn {
+    background: var(--cream);
+    color: var(--dark);
+    border: none;
+    border-radius: 30px;
+    padding: 0.75rem 1.6rem;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .send-btn:hover { background: #ffffff; }
+  .summary-box {
+    display: none;
+    margin-top: 1.1rem;
+    text-align: left;
+  }
+  .summary-box.visible { display: block; }
+  .summary-box textarea {
+    width: 100%;
+    min-height: 220px;
+    border-radius: 10px;
+    border: none;
+    padding: 0.9rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--cream);
+    resize: vertical;
+  }
+  .summary-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+    flex-wrap: wrap;
+  }
+  .summary-actions button, .summary-actions a {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    background: var(--brand);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .summary-actions .copied { background: #4d8a86; }
+  .summary-hint {
+    color: #9fb8b4;
+    font-size: 0.75rem;
+    margin-top: 0.6rem;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.7rem; }
+    .header { padding: 2rem 1.25rem 1.75rem; }
+    main { padding: 1.5rem 1.1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">The Ledger — Proof of Solvency</p>
+    <h1>Tester Guide</h1>
+    <p class="sub">A working checklist, not a manual. Go through each section in whatever order makes sense to you — check things off as you go, and jot a quick note anywhere something felt confusing, broken, or just worth mentioning.</p>
+  </div>
+</div>
+
+<div class="tally-bar">
+  <div class="tally-inner">
+    <span class="tally-count" id="tallyCount">0 / 0</span>
+    <div class="tally-track"><div class="tally-fill" id="tallyFill"></div></div>
+    <button class="reset-link" id="resetBtn">reset</button>
+  </div>
+</div>
+
+<main>
+  <div class="intro">
+    <b>What I'm hoping to learn:</b> not just "does it work," but where it's confusing, where you had to guess, and anything that made you stop and think "wait, what?" There are no wrong notes — a UI that only makes sense to the person who built it is a real bug.
+  </div>
+
+  <div class="intro" style="border-left:4px solid var(--brand);">
+    <b>Two ways to try it — pick either (or both):</b>
+    <p style="margin:0.6rem 0 0;"><b>Option A — Use the sample data.</b> I've included a demo backup file (<b>the-ledger-demo-backup.json</b>) full of a made-up family's finances. Import it and every screen fills with realistic data instantly — nothing of yours involved. Easiest way to see the whole app working, and safe to delete, edit, and experiment freely.</p>
+    <p style="margin:0.6rem 0 0;"><b>Option B — Use your own data.</b> If you already keep a budget you can export, importing your own numbers is the <i>best</i> way to catch real bugs — you'll instantly notice when something looks wrong, because you know what right looks like. Your data stays entirely on your own device. If you go this route, treat your backup file as sensitive, like any financial document.</p>
+    <p style="margin:0.6rem 0 0;color:var(--ink-light);font-size:0.85rem;">Not sure? Start with Option A — it takes ten seconds and you can always clear it and import your own later.</p>
+  </div>
+
+  <div id="checklist"></div>
+
+  <div class="send-section">
+    <h3>Send your feedback</h3>
+    <p>This puts everything you checked and noted into one summary — nothing sends automatically, you'll see exactly what goes out before it does.</p>
+    <button class="send-btn" id="reviewBtn">Review &amp; send feedback</button>
+
+    <div class="summary-box" id="summaryBox">
+      <textarea id="summaryText" readonly></textarea>
+      <div class="summary-actions">
+        <a id="mailtoBtn" href="#">Open in email app</a>
+        <button id="copyBtn">Copy text</button>
+      </div>
+      <p class="summary-hint">If "Open in email app" doesn't do anything on your device, use Copy text and paste it into an email yourself — either way, it's going to <b>newappfeedback@gmail.com</b>.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Notes are saved automatically in this browser as you go — nothing is sent until you choose to send it.
+</footer>
+
+<script>
+const CHECKLIST = [
+  {
+    group: "Getting started",
+    items: [
+      {
+        id: "install",
+        title: "Install it like a real app",
+        desc: "Open the link, then add it to your home screen (iPhone: Share → Add to Home Screen. Android/Chrome: menu → Install app). Confirm it opens full-screen, no browser bar.",
+      },
+      {
+        id: "help-tab",
+        title: "Find the guide without being told where it is",
+        desc: "There's a ? at the far right of the tab bar. Tap it — quick start, both guides, and the feedback form. Question: if you'd been stuck on something, would you have found this on your own?",
+        flag: "new",
+      },
+      {
+        id: "empty-state",
+        title: "See what a blank slate looks like (before importing)",
+        desc: "Before importing anything, glance at the Dashboard. Does the empty-state message make sense? Would you know what to do next without me explaining it?",
+      },
+      {
+        id: "import-demo",
+        title: "Import the sample data (Option A)",
+        desc: "Setup → Backup → Import backup, then pick the-ledger-demo-backup.json. The whole app should fill with a made-up family's finances. Skip this if you're importing your own data instead.",
+        flag: "new",
+      },
+      {
+        id: "import-own",
+        title: "Or import your own backup (Option B)",
+        desc: "If you kept a backup of your real data, import it the same way (Setup → Backup → Import). You'll catch far more this way — you know when a number looks wrong. Your data never leaves your device.",
+        flag: "watch",
+      },
+      {
+        id: "quickstart",
+        title: "Read the quick start",
+        desc: "Help → Quick start. Six steps from an empty app to a savings plan. Does it actually get you started, or does it assume you already know things? (It's built into the app, so it works with no connection — the two full guides don't.)",
+        flag: "new",
+      },
+      {
+        id: "add-account",
+        title: "Add an account from scratch",
+        desc: "Setup → Accounts → Add account. Try naming it, grouping it, and setting a starting balance. Does the form feel complete, or did you want a field that isn't there?",
+      },
+      {
+        id: "offline",
+        title: "Try it with no connection",
+        desc: "After opening it once, turn on airplane mode and reopen the app. It should still load and work. This is the whole point of the offline build — flag it hard if it fails.",
+        flag: "watch",
+      },
+    ],
+  },
+  {
+    group: "Dashboard",
+    items: [
+      {
+        id: "heatmap",
+        title: "Tap around the year heatmap",
+        desc: "Tap a few different months. Confirm the whole dashboard updates to that month, and that the \"Today\" button appears to jump back.",
+      },
+      {
+        id: "budget-health",
+        title: "Check the Budget Health card",
+        desc: "Look at the spent-vs-budgeted bar and the \"running over\" list. Does the math match what you'd expect from what you've actually spent?",
+      },
+      {
+        id: "networth-chart",
+        title: "Read the net worth projection",
+        desc: "Does the 12-month chart make intuitive sense? Would you know what it's including (or not including) without asking?",
+      },
+    ],
+  },
+  {
+    group: "Track (Register · Scheduled · Reports)",
+    items: [
+      {
+        id: "add-transaction",
+        title: "Log a transaction manually",
+        desc: "Add a one-off purchase to any account. Check that it shows up correctly, with the right running balance.",
+      },
+      {
+        id: "edit-occurrence",
+        title: "Edit an upcoming bill occurrence",
+        desc: "Tap an upcoming bill in Register or Scheduled. Try \"Log as paid,\" then try editing just one occurrence vs. \"all future occurrences.\" Is the distinction clear?",
+      },
+      {
+        id: "envelope",
+        title: "Watch an envelope spend down",
+        desc: "The sample data has envelope bills (Groceries and Gas) — or use your own. Assign a transaction to one from the Register and confirm the remaining balance updates. Does \"assign to budget\" make sense as an action?",
+        flag: "new",
+      },
+      {
+        id: "reports-groupby",
+        title: "Try all three Reports groupings",
+        desc: "Reports → pick any two accounts → switch between Account / Category / Payee. Click into a month to drill into the real transactions behind a number.",
+        flag: "new",
+      },
+      {
+        id: "alltxns",
+        title: "Find something without knowing which account it's in",
+        desc: "Track → All Transactions. Every account at once, newest first. Search for a shop you've been to. Is this where you'd have looked, or did you go hunting through registers first?",
+        flag: "new",
+      },
+      {
+        id: "notes",
+        title: "Leave yourself a note on a transaction",
+        desc: "Open any transaction — there's a Notes box under the other fields, separate from the description (which is whatever the bank called it). Write something, save, and look at the row: a small speech bubble should appear. Now search for a word from your note; it should find the row. Good test: a transfer that covers several bills, with the bills named in the note.",
+        flag: "new",
+      },
+    ],
+  },
+  {
+    group: "Cleaning up an import",
+    items: [
+      {
+        id: "nopayee-filter",
+        title: "Find the rows your bank didn't name",
+        desc: "All Transactions → tick \"No payee.\" These are transactions that never got a payee, usually because the bank sent a description instead of a merchant name. Was the number bigger than you expected? (Transfers are left out on purpose — money moving between your own accounts has no merchant.)",
+        flag: "new",
+      },
+      {
+        id: "search-plus-filter",
+        title: "Stack a search on top of it",
+        desc: "Keep \"No payee\" ticked and search for something the raw bank text has in common — a store number, part of a name. The two filters stack. That's the whole idea: you know what \"654\" means, so you do the grouping and the app never has to guess.",
+        flag: "new",
+      },
+      {
+        id: "bulk-edit",
+        title: "Fix a whole batch in one go",
+        desc: "With those rows showing, tap Select → Select all → Edit → Payee. Type the real name and apply. Did the count drop the way you expected? And would you have trusted this on twenty rows without checking them first?",
+        flag: "new",
+      },
+      {
+        id: "bulk-warning",
+        title: "Try to overwrite something on purpose",
+        desc: "Select rows that ALREADY have a payee, then Edit → Payee. It should warn you how many you're about to replace. Then Cancel. Is that warning clear enough to stop you, or would you have tapped straight past it?",
+        flag: "watch",
+      },
+      {
+        id: "bulk-register",
+        title: "Do the same thing inside one account",
+        desc: "Open a Register → Select. Each statement period (or month) gets its own \"Select all,\" and picking two statements should add up rather than replace. Upcoming and Overdue deliberately have no checkboxes — they haven't happened yet. Does that feel right, or restrictive?",
+        flag: "new",
+      },
+    ],
+  },
+  {
+    group: "Plan (Income · Savings Plan · Budget)",
+    items: [
+      {
+        id: "paycheck-estimator",
+        title: "Try the paycheck estimator",
+        desc: "If you have hourly income set up, enter some hours and see the estimate. If not, just look at whether the concept is clear from the UI alone.",
+      },
+      {
+        id: "savings-plan-math",
+        title: "Expand \"Show the math\" on Savings Plan",
+        desc: "Does the explanation actually explain it, or does it read like something only the builder would understand?",
+        flag: "watch",
+      },
+      {
+        id: "budget-tab",
+        title: "Skim the Budget tab category breakdown",
+        desc: "Does the essential/non-essential distinction make sense? Would you know how to mark a bill as essential without being told?",
+      },
+    ],
+  },
+  {
+    group: "Goals (Debt Payoff · Wishlist)",
+    items: [
+      {
+        id: "strategy-compare",
+        title: "Compare payoff strategies",
+        desc: "Debt Payoff → look at the strategy comparison. Is it clear what \"snowball\" vs. \"avalanche\" actually means without a finance background?",
+      },
+      {
+        id: "wishlist-add",
+        title: "Add a wishlist item",
+        desc: "Set a priority and a funding source. Does the priority ordering behave the way you'd expect?",
+      },
+    ],
+  },
+  {
+    group: "Setup (Bills · Transfers · Gifts · Backup)",
+    items: [
+      {
+        id: "add-bill",
+        title: "Add a recurring bill",
+        desc: "Try at least two different frequencies (monthly and yearly). If you're feeling thorough, try the \"every few years\" option too.",
+      },
+      {
+        id: "add-gift",
+        title: "Add a birthday gift",
+        desc: "Try the \"also plan a matching Christmas gift\" checkbox. Does one action creating two entries feel expected or surprising?",
+      },
+      {
+        id: "backup-export",
+        title: "Export a backup",
+        desc: "Setup → Backup → Export. Confirm a real file actually downloads to your device.",
+        flag: "watch",
+      },
+      {
+        id: "nav-groups",
+        title: "Navigate using the group menus",
+        desc: "Try reaching five or six different tabs using Track / Plan / Goals / Setup. Did anything feel buried or hard to find on the first try?",
+        flag: "new",
+      },
+    ],
+  },
+  {
+    group: "Overall impressions",
+    items: [
+      {
+        id: "confusing",
+        title: "Anything that confused you",
+        desc: "Doesn't have to be a bug — just anywhere you paused and weren't sure what to do next.",
+      },
+      {
+        id: "missing",
+        title: "Anything you expected to exist but couldn't find",
+        desc: "A feature, a setting, a piece of information you went looking for.",
+      },
+      {
+        id: "would-use",
+        title: "Would you actually use this day to day?",
+        desc: "Honest gut reaction — not about any specific feature, just the whole thing.",
+      },
+    ],
+  },
+];
+
+const STORAGE_KEY = "ledger-tester-guide-v3";
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+function render() {
+  const listEl = document.getElementById("checklist");
+  listEl.innerHTML = "";
+  let total = 0, done = 0;
+
+  CHECKLIST.forEach(group => {
+    const section = document.createElement("section");
+    section.className = "group";
+
+    const head = document.createElement("div");
+    head.className = "group-head";
+    const groupDone = group.items.filter(i => state[i.id]?.checked).length;
+    head.innerHTML = `<h2>${group.group}</h2><span class="count">${groupDone} / ${group.items.length}</span>`;
+    section.appendChild(head);
+
+    group.items.forEach(item => {
+      total++;
+      const entry = state[item.id] || { checked: false, note: "" };
+      if (entry.checked) done++;
+
+      const el = document.createElement("div");
+      el.className = "item" + (entry.checked ? " checked" : "");
+
+      const flagHtml = item.flag === "watch"
+        ? '<span class="item-flag watch">worth extra attention</span>'
+        : item.flag === "new"
+        ? '<span class="item-flag new">new feature</span>'
+        : "";
+
+      el.innerHTML = `
+        <div class="checkbox" data-id="${item.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="item-body">
+          <p class="item-title" data-id="${item.id}">${item.title}${flagHtml}</p>
+          <p class="item-desc">${item.desc}</p>
+          <div class="notes-field">
+            <textarea placeholder="Notes (optional)" data-id="${item.id}">${entry.note || ""}</textarea>
+          </div>
+        </div>
+      `;
+      section.appendChild(el);
+    });
+
+    listEl.appendChild(section);
+  });
+
+  document.querySelectorAll(".checkbox, .item-title").forEach(el => {
+    el.addEventListener("click", () => toggleItem(el.dataset.id));
+  });
+  document.querySelectorAll(".notes-field textarea").forEach(el => {
+    el.addEventListener("input", () => {
+      const id = el.dataset.id;
+      state[id] = state[id] || { checked: false, note: "" };
+      state[id].note = el.value;
+      saveState(state);
+    });
+  });
+
+  document.getElementById("tallyCount").textContent = `${done} / ${total}`;
+  document.getElementById("tallyFill").style.width = total ? `${(done / total) * 100}%` : "0%";
+}
+
+function toggleItem(id) {
+  state[id] = state[id] || { checked: false, note: "" };
+  state[id].checked = !state[id].checked;
+  saveState(state);
+  render();
+}
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Clear all checked items and notes?")) {
+    state = {};
+    saveState(state);
+    render();
+  }
+});
+
+const FEEDBACK_EMAIL = "newappfeedback@gmail.com";
+const MAILTO_SAFE_LIMIT = 1600; // conservative — mailto: URLs get unreliable well before browsers' hard caps
+
+function buildSummary() {
+  const lines = [];
+  let total = 0, done = 0;
+  CHECKLIST.forEach(g => { total += g.items.length; });
+  Object.values(state).forEach(e => { if (e.checked) done++; });
+
+  lines.push(`The Ledger — Tester Feedback (${done}/${total} tried)`);
+  lines.push(new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
+  lines.push("");
+
+  CHECKLIST.forEach(group => {
+    lines.push(`— ${group.group} —`);
+    group.items.forEach(item => {
+      const entry = state[item.id] || { checked: false, note: "" };
+      lines.push(`[${entry.checked ? "x" : " "}] ${item.title}`);
+      if (entry.note && entry.note.trim()) {
+        lines.push(`    note: ${entry.note.trim()}`);
+      }
+    });
+    lines.push("");
+  });
+
+  return lines.join("\n").trim();
+}
+
+function showSummary() {
+  const text = buildSummary();
+  document.getElementById("summaryText").value = text;
+  document.getElementById("summaryBox").classList.add("visible");
+
+  const subject = encodeURIComponent("The Ledger — Tester Feedback");
+  const body = encodeURIComponent(text);
+  const mailtoBtn = document.getElementById("mailtoBtn");
+
+  if (body.length > MAILTO_SAFE_LIMIT) {
+    mailtoBtn.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}`;
+    mailtoBtn.textContent = "Open email app (paste text below)";
+  } else {
+    mailtoBtn.href = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+    mailtoBtn.textContent = "Open in email app";
+  }
+
+  document.getElementById("summaryBox").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+document.getElementById("reviewBtn").addEventListener("click", showSummary);
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const textarea = document.getElementById("summaryText");
+  const btn = document.getElementById("copyBtn");
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+  } catch (e) {
+    textarea.select();
+    document.execCommand("copy");
+  }
+  const original = btn.textContent;
+  btn.textContent = "Copied!";
+  btn.classList.add("copied");
+  setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1800);
+});
+
+render();
+</script>
+
+</body>
+</html>
