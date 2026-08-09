@@ -99,6 +99,21 @@
 </script>
 
 <script src="./storage-shim.js"></script>
+<!-- ⚠ MUST LOAD AFTER storage-shim.js AND BEFORE main.js. The shim defines
+     window.storage; the migration uses it. Order is load-bearing.
+
+     ⚠ WHY THIS LINE LIVES IN THE REPO NOW (build 107, Aug 9). It used to be
+     hand-added to two copies on the Mac only — not in any build zip, not on
+     GitHub. So copying a new index.html from a build package DELETED it, no
+     error was raised, the app built and launched normally, and the migration
+     simply never ran: the native app opened empty and the cause was invisible.
+     That happened once already (July 22) and was caught only by grepping.
+     Shipping the line means it can no longer be lost by a file copy.
+
+     ⚠ SAFE IN THE BROWSER. native-migration.js detects it isn't running under
+     Capacitor and does nothing — no Capacitor, nothing to migrate to. The PWA
+     is unaffected. -->
+<script src="./native-migration.js"></script>
 <script type="module" src="./main.js"></script>
 </body>
 </html>
