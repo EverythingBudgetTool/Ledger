@@ -34,3 +34,30 @@ if (!isNativeApp && "serviceWorker" in navigator) {
     });
   });
 }
+
+// ⚠ NATIVE: ACTIVELY UNREGISTER ANY SERVICE WORKER LEFT BEHIND.
+//
+// Build 110 added the guard above so a service worker is never REGISTERED
+// under Capacitor. That was necessary but not sufficient: the native app had
+// already run earlier builds WITHOUT the guard, and those registrations
+// PERSIST in the webview's storage. A guard that only prevents new
+// registrations leaves the old one installed, still claiming the page and
+// still able to restart it — the reload loop returns intermittently, long
+// after the code that caused it is gone.
+//
+// Her report, build 110: the native app hung again, and clearing browser data
+// fixed it. That is the signature of stale STORED state rather than bad code.
+//
+// So: on native, don't just abstain — clean up. Unregister everything and drop
+// the caches. Idempotent; a no-op once there is nothing left to remove.
+if (isNativeApp && "serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then(regs => {
+      if (!regs.length) return;
+      console.log("[native] removing " + regs.length + " stale service worker registration(s)");
+      return Promise.all(regs.map(r => r.unregister()));
+    })
+    .then(() => (typeof caches !== "undefined" && caches.keys ? caches.keys() : []))
+    .then(keys => Promise.all((keys || []).map(k => caches.delete(k))))
+    .catch(err => console.warn("[native] service worker cleanup failed:", err));
+}
